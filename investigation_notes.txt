@@ -1,72 +1,108 @@
 SOC LAB: SUSPICIOUS LOGIN INVESTIGATION
 
-Data: Synthetic training logs.
+DATA AND SCOPE
+15 synthetic authentication records.
 No real accounts were accessed or changed.
+All follow-up scenarios are fictional.
+No containment actions were performed.
 
-Detection rule:
+DETECTION RULE
 Five or more failed logins followed by a successful login
-for the same user and source IP within five minutes.
+for the same account and source IP within five minutes.
 
-Results:
-15 records analysed.
+RESULTS
 Two alerts generated: charlie and diana.
+An alert identifies a suspicious sequence, not proof of compromise.
 
-CHARLIE — INITIAL EVIDENCE
+
+CASE 01: CHARLIE
+
+CSV EVIDENCE
 Source IP: 198.51.100.50
 Failed attempts: 5
 First failure: 2026-10-05 10:00:00 UTC
 Successful login: 2026-10-05 10:02:30 UTC
+Elapsed time: 2 minutes 30 seconds
 
-Initial assessment:
-Suspicious login sequence. These logs alone cannot confirm
-whether the account was compromised.
+INITIAL ASSESSMENT
+The sequence meets the detection threshold.
+Authentication records alone cannot establish whether the
+successful login was authorised.
 
 HYPOTHETICAL FOLLOW-UP
-For this exercise, assume Charlie denies the login and
-the device is unfamiliar. These details are scenario
-assumptions, not evidence contained in the CSV.
+For this training scenario, assume:
+- Charlie denies making the successful login.
+- The device is unfamiliar.
 
-Assessment:
+These are fictional assumptions, not findings from the CSV.
+
+SCENARIO ASSESSMENT
 Suspected account compromise requiring escalation.
+The assumed user denial and unfamiliar device increase concern,
+but further evidence is needed to determine the incident scope.
 
-Proposed response:
+PROPOSED RESPONSE
 1. Preserve authentication and related activity logs.
 2. Review MFA results, device details and post-login activity.
 3. Escalate to the senior SOC analyst.
-4. Follow the approved playbook to revoke sessions and
-   reset the password; consider temporary account disablement.
-5. Document findings and monitor for further suspicious activity.
+4. Follow the approved response playbook and authorisation
+   process for session revocation and password reset.
+5. Consider temporary account disablement based on the
+   investigation findings and approved procedure.
+6. Document decisions and monitor for further suspicious activity.
 
-Limitations:
-No MFA, device or post-login evidence was provided.
-No containment actions were performed.
-Diana's alert has not yet been investigated.
+DISPOSITION
+Escalation proposed under the fictional scenario.
+Compromise is not confirmed by the supplied CSV.
 
-DIANA — TRAINING INVESTIGATION
 
-CSV evidence:
-Five failed logins followed by a successful login from
-203.0.113.25 between 11:00:00 and 11:02:30 UTC.
+CASE 02: DIANA
 
-Hypothetical follow-up findings:
-Diana confirms repeated password typing errors.
-The device matches her usual device.
-MFA completed successfully.
-No unusual post-login activity was identified.
+CSV EVIDENCE
+Source IP: 203.0.113.25
+Failed attempts: 5
+First failure: 2026-10-05 11:00:00 UTC
+Successful login: 2026-10-05 11:02:30 UTC
+Elapsed time: 2 minutes 30 seconds
 
-These follow-up findings are fictional scenario details,
-not evidence contained in the CSV.
+INITIAL ASSESSMENT
+The sequence meets the same detection threshold as Charlie's.
+The CSV alone does not establish a benign or malicious cause.
 
-Assessment:
-Likely benign login activity. The rule detected the intended
-pattern, but the additional context supports a false positive
-for malicious activity.
+HYPOTHETICAL FOLLOW-UP
+For this training scenario, assume:
+- Diana confirms repeated password typing errors.
+- The device matches her usual device.
+- MFA completed successfully.
+- A review identifies no unusual post-login activity.
 
-Proposed disposition:
-Document the supporting evidence and close as benign under
-the team's review procedure. No containment is proposed
-based on the supplied scenario.
+These are fictional assumptions, not findings from the CSV.
 
-Lesson:
-The same login pattern can have different explanations.
-An alert requires investigation before a final decision.
+SCENARIO ASSESSMENT
+Likely benign authentication activity.
+The combined scenario context supports this assessment;
+successful MFA alone would not establish that a login is benign.
+
+PROPOSED RESPONSE
+1. Document the assumed user confirmation and supporting context.
+2. Record why the sequence met the detection threshold.
+3. Close as benign under the team's review procedure.
+4. Do not propose containment based on this scenario.
+
+DISPOSITION
+Benign closure proposed under the fictional scenario.
+The rule correctly detected its target pattern, but the
+scenario does not indicate malicious activity.
+
+
+LIMITATIONS
+- Synthetic data provides limited authentication context.
+- No actual MFA, device or post-login records were supplied.
+- User confirmation was assumed, not obtained.
+- Neither account's real-world status can be determined.
+- All response actions are proposals only.
+
+KEY LESSON
+Identical alert patterns can have different explanations.
+Separate observed evidence from assumptions, seek additional
+context and document the reasoning behind each decision.
