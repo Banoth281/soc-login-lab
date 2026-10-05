@@ -1,0 +1,72 @@
+SOC LAB: SUSPICIOUS LOGIN INVESTIGATION
+
+Data: Synthetic training logs.
+No real accounts were accessed or changed.
+
+Detection rule:
+Five or more failed logins followed by a successful login
+for the same user and source IP within five minutes.
+
+Results:
+15 records analysed.
+Two alerts generated: charlie and diana.
+
+CHARLIE — INITIAL EVIDENCE
+Source IP: 198.51.100.50
+Failed attempts: 5
+First failure: 2026-10-05 10:00:00 UTC
+Successful login: 2026-10-05 10:02:30 UTC
+
+Initial assessment:
+Suspicious login sequence. These logs alone cannot confirm
+whether the account was compromised.
+
+HYPOTHETICAL FOLLOW-UP
+For this exercise, assume Charlie denies the login and
+the device is unfamiliar. These details are scenario
+assumptions, not evidence contained in the CSV.
+
+Assessment:
+Suspected account compromise requiring escalation.
+
+Proposed response:
+1. Preserve authentication and related activity logs.
+2. Review MFA results, device details and post-login activity.
+3. Escalate to the senior SOC analyst.
+4. Follow the approved playbook to revoke sessions and
+   reset the password; consider temporary account disablement.
+5. Document findings and monitor for further suspicious activity.
+
+Limitations:
+No MFA, device or post-login evidence was provided.
+No containment actions were performed.
+Diana's alert has not yet been investigated.
+
+DIANA — TRAINING INVESTIGATION
+
+CSV evidence:
+Five failed logins followed by a successful login from
+203.0.113.25 between 11:00:00 and 11:02:30 UTC.
+
+Hypothetical follow-up findings:
+Diana confirms repeated password typing errors.
+The device matches her usual device.
+MFA completed successfully.
+No unusual post-login activity was identified.
+
+These follow-up findings are fictional scenario details,
+not evidence contained in the CSV.
+
+Assessment:
+Likely benign login activity. The rule detected the intended
+pattern, but the additional context supports a false positive
+for malicious activity.
+
+Proposed disposition:
+Document the supporting evidence and close as benign under
+the team's review procedure. No containment is proposed
+based on the supplied scenario.
+
+Lesson:
+The same login pattern can have different explanations.
+An alert requires investigation before a final decision.
