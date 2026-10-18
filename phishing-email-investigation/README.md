@@ -56,3 +56,10 @@ Extend negative cases, add robust MIME parsing, and develop safe report generati
 Run `./Test-LabEmail.ps1` from Windows PowerShell. It checks sample hash, sender, Reply-To, subject, folded header, exact URL, unverified authentication status, analyst-review verdict, JSON roundtrip, and malformed-input rejection. Execution happens in a temporary directory that is removed afterward; original evidence files are not overwritten.
 
 The GitHub workflow runs on relevant pushes and pull requests with read-only repository access. Hosted execution status is available through the badge above.
+
+## HTML investigation report
+Run `./New-PhishingReport.ps1` next to analysis.json and extracted-evidence.json, then open phishing-report.html in a browser. No administrator access is needed. The generator leaves JSON inputs unchanged and writes only its HTML output.
+
+The report combines extracted headers and hash with the separate analyst assessment. All dynamic text is HTML-encoded; extracted URLs are plain text. The observations and response guidance are specific to this synthetic fixture. A matching valid hash is required across both JSON inputs.
+
+`./Test-PhishingReport.ps1` validates report generation, key evidence, encoded markup, verdict display, and absence of anchor links using a temporary directory. GitHub CI runs this check alongside the ten extraction checks. Browser visual verification remains pending.
