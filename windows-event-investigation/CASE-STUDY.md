@@ -46,3 +46,8 @@ The lab does not demonstrate a production deployment, malicious intrusion, a liv
 ## References
 - [Microsoft Event 4625](https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4625)
 - [Microsoft auditpol](https://learn.microsoft.com/windows-server/administration/windows-commands/auditpol)
+
+## Advanced v2 follow-up
+The collector and detector now separate destination host, domain, account and source IP; validate required event fields; and deduplicate event identities before analysis. A two-index scan replaces repeated full-window scans. Alert evidence includes contributing record IDs.
+
+The user ran 30/30 original v2 tests and collected two actual Windows records with host/domain context: 2 unique events and 0 alerts. The corrected generator produced a local report showing 0 duplicates. SHA-256 checks confirmed that the CSV and HTML matched their saved manifest. The path-resolution regression brings the hosted suite to 31/31 passing cases. See [local v2 validation](evidence/LOCAL-V2-VALIDATION.md) for provenance, hashes, and limits. No raw CSV or HTML was uploaded.
