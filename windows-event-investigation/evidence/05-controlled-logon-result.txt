@@ -1,5 +1,5 @@
 # Controlled failed-logon result
-Source: event General-tab text and command output supplied by the user on 18 October 2026. This is a sanitised transcription, not an EVTX export or independently verified capture. Host/domain identifiers replaced with [LAB-HOST]. Event timestamp, EventRecordID, and XML System/EventID were not supplied.
+Source: event General-tab text and command output supplied by the user on 18 October 2026. This is a sanitised transcription, not an EVTX export or independently verified capture. Host/domain identifiers replaced with [LAB-HOST]. Subsequent user-supplied XML confirms EventID 4625, TimeCreated 2026-10-18T08:18:19.3299718Z, and EventRecordID 1832673. Displayed local time: 18 October 2026, 13:48:19 (consistent with UTC+05:30).
 
 Command:
 net use \\127.0.0.1\IPC$ /user:%COMPUTERNAME%\SOC_Lab_Test_User *
@@ -38,4 +38,13 @@ Analysis:
 - 0xC0000064 indicates an unrecognised/nonexistent username.
 - Loopback source and matching test account support correlation with the authorised local test.
 - This demonstrates one expected failed-logon record based on supplied text; it does not demonstrate an attack, successful login, or SIEM alert.
-- Exact time/record correlation and original event preservation remain pending.
+- Event identity and timestamp are confirmed within supplied XML. The matching account, loopback source, source port, and failure fields support correlation with the local test. No independent command timestamp or EVTX export was supplied; original event preservation remains a recommended follow-up.
+
+Selected XML metadata transcribed from the user-supplied record:
+<EventID>4625</EventID>
+<TimeCreated SystemTime="2026-10-18T08:18:19.3299718Z" />
+<EventRecordID>1832673</EventRecordID>
+<Channel>Security</Channel>
+<Computer>[LAB-HOST]</Computer>
+
+This excerpt is sanitised documentation, not a complete XML export.
