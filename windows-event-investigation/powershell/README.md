@@ -13,7 +13,7 @@ Group repeated failures by **destination computer, account domain, account name,
 | Window scan | Repeated full scans | Sorted groups with two moving window indices |
 | Alert evidence | Counts and times | Context, counts, times, and contributing record IDs |
 | Report | Imported count | Imported/unique counts, removed duplicates, context and alerts |
-| Tests | 8 original synthetic cases | 30 regression cases including report integration |
+| Tests | 8 original synthetic cases | 31 regression cases including report integration and relative-path handling |
 
 ## Collection and detection
 Download all four .ps1 files together. In elevated Windows PowerShell:
@@ -61,7 +61,7 @@ The report validates and deduplicates input, shows unique and imported counts, a
 ```powershell
 ./Test-RepeatedFailures.ps1
 ```
-No log access, admin rights, or login attempts are required. Thirty cases retain the original threshold/window/account/source checks and add host/domain separation, duplicate/conflict handling, timezone and IPv6 normalisation, required-field rejection, configurable settings, later-window detection, and report integration.
+No log access, admin rights, or login attempts are required. The original thirty cases retain the original threshold/window/account/source checks and add host/domain separation, duplicate/conflict handling, timezone and IPv6 normalisation, required-field rejection, configurable settings, later-window detection, and report integration.
 
 Hosted v2 verification: **30/30 regression cases passed** on Windows in [run 39117628101](https://github.com/Banoth281/soc-login-lab/actions/runs/39117628101), testing commit 4e8f40eb252d95aff25c9bbde221a039821a6206. This includes duplicate handling, context isolation, validation, and report integration. No local v2 PowerShell run has been claimed in the authoring environment.
 
@@ -69,7 +69,7 @@ Hosted v2 verification: **30/30 regression cases passed** on Windows in [run 391
 [Historical v1 validation](VALIDATION-V1.md) preserves the two actual user-observed test events, eight original tests, successful v1 packaged run, and reviewed v1 HTML screenshot. Those are historical results, not proof that v2 has been run against the user's machine. The v2 suite uses synthetic records and temporary CSV/HTML files.
 
 ## Limits and next steps
-- Validate v2 collection against the user's actual Windows log after upgrading all scripts.
+- Completed: v2 collector ran against the user's actual Windows log; two events and full host/domain context were reported.
 - Add collector-specific integration tests and stress/performance benchmarks.
 - Unknown domain "-" values cannot establish account namespace separation.
 - The detector combines logon types within each group; tune or extend keys for a specific environment.
@@ -80,4 +80,7 @@ Hosted v2 verification: **30/30 regression cases passed** on Windows in [run 391
 ## Local v2 verification and path fix
 The user subsequently ran all 30 original v2 checks successfully and collected 2 actual records, 2 unique records, and 0 alerts with host/domain context. The CSV was saved locally. User console output also confirmed HTML generation, but a relative output path initially resolved to the process working directory (System32) instead of PowerShell's location.
 
-The generator now uses PowerShell provider path resolution for both output and input-path protection. Console counts distinguish imported, unique, and duplicate records. A new regression changes PowerShell's location before generating a relative-path report. **31/31 checks passed** in [Windows CI run 39119036887](https://github.com/Banoth281/soc-login-lab/actions/runs/39119036887). User execution of the corrected generator and visual v2 HTML review remain pending.
+The generator now uses PowerShell provider path resolution for both output and input-path protection. Console counts distinguish imported, unique, and duplicate records. A new regression changes PowerShell's location before generating a relative-path report. **31/31 checks passed** in [Windows CI run 39119036887](https://github.com/Banoth281/soc-login-lab/actions/runs/39119036887). The user subsequently ran the corrected generator successfully: 2 imported records, 2 unique records, 0 removed duplicates, and 0 alerts, saved in the requested local folder. Opening was confirmed; visual layout has not been reviewed from a screenshot.
+
+## Completed local v2 evidence checks
+[Local validation and hash record](../evidence/LOCAL-V2-VALIDATION.md) documents user-observed v2 collection, corrected report generation, manifest creation, and two successful SHA-256 verification checks. Local suite: 30/30; hosted suite after the path fix: 31/31. Raw v2 artifacts remain local.
