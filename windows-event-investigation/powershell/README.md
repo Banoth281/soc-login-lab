@@ -69,3 +69,8 @@ Substatus: 0xc0000064
 ```
 
 Outcome: packaged reader/detector integration passed for the two-event below-threshold case, based on the supplied console transcript. Synthetic positive and boundary checks were previously run interactively. No live five-event positive detection or scheduled monitoring was demonstrated. Process-scoped policy ends when the PowerShell session closes.
+
+## Automated synthetic checks
+Run `./Test-RepeatedFailures.ps1` from this folder. It loads the detector relative to its own path and checks eight scenarios: positive threshold, below threshold, inclusive/exclusive time boundary, source isolation, account isolation, unsorted input, and empty input. It also validates key alert details for positive cases. Any failing assertion raises a terminating error. This script does not access real logs or generate authentication attempts.
+
+Status: test script published; execution of this new automated suite is pending. PowerShell is unavailable in the authoring environment. Earlier interactive validation and packaged reader verification remain documented separately.
