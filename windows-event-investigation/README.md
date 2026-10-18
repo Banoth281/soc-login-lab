@@ -1,12 +1,12 @@
 # Windows Failed-Logon Investigation
 **Author:** Santhosh Banoth  
 **Lab date:** 18 October 2026  
-**Status:** In progress — audit configuration verified; Event 4625 capture pending.
+**Status:** Controlled failed-logon record obtained and interpreted from user-supplied event text. Original event export and timestamp/record-ID validation remain pending.
 
 A free local SOC investigation exercise using Windows Event Viewer and auditpol on an 8 GB RAM Windows computer. This folder records the actual work completed during the session. The repository's other simulated-data exercises are separate; their results do not validate this live Windows test.
 
 ## Objective
-Generate one controlled failed logon against a nonexistent local test account, find Event 4625, interpret the failure fields, and document the outcome. No Azure, Sentinel, Wazuh deployment, production incident, or successful detection is claimed.
+Generate one controlled failed logon against a nonexistent local test account, find Event 4625, interpret the failure fields, and document the outcome. No Azure, Sentinel, Wazuh deployment, production incident, is claimed. Local event recording was demonstrated through user-supplied text; no SIEM alert was tested.
 
 ## Confirmed actions and evidence
 | Action | Observed result | Evidence |
@@ -23,6 +23,13 @@ Screenshots are original user-provided captures. The transcript is a transcripti
 ## Evidence availability
 The three original screenshots were reviewed during the session but are not included in this public repository. Public upload was blocked by automatic approval review pending explicit approval for those images. The sanitised command transcript is included. No raw Windows event logs are published.
 
+## Validated local test outcome
+After runas repeatedly failed to acquire password input, a single loopback IPC$ authentication test returned error 1326. The user then supplied failed-logon event text for SOC_Lab_Test_User with Logon Type 3, Status 0xC000006D, Sub Status 0xC0000064, and source 127.0.0.1.
+
+This supports an expected network authentication failure for an unrecognised account. It is authorised lab activity, not evidence of intrusion. See [sanitised command and event evidence](evidence/05-controlled-logon-result.txt).
+
+The supplied General-tab text is consistent with Event 4625. The XML event identifier, event timestamp, and record ID were not provided, so exact correlation and original-record verification remain pending.
+
 ## Reproduction and next steps
 Use your own authorised lab computer.
 1. Open Command Prompt as administrator.
@@ -33,13 +40,14 @@ Use your own authorised lab computer.
    `runas /user:.\\SOC_Lab_Test_User "cmd.exe"`
 5. At the password prompt, manually enter a made-up, nonempty test password. Input is hidden. Do not use an actual account password.
 6. Record the exact runas outcome. An input-acquisition error is not proof of authentication failure.
-7. In Event Viewer, open Windows Logs > Security, filter Event ID 4625, and refresh.
+7. The working alternative on this machine was `net use \\\\127.0.0.1\\IPC$ /user:%COMPUTERNAME%\\SOC_Lab_Test_User *`. Enter a made-up password once. Error 1326 was observed.
+8. In Event Viewer, open Windows Logs > Security, filter Event ID 4625, and refresh.
 8. If an event appears, record timestamp and timezone, event record ID, Failure Reason, Status, Sub Status, and Logon Type. Confirm the target matches the lab account.
 9. Retain original event evidence privately. Publish only reviewed, sanitised evidence and explain any redactions.
 
 ## Troubleshooting
 - **0x00000522:** initial command lacked the required privilege. Retrying elevated successfully returned the audit policy.
-- **Unable to acquire user password:** observed twice in the supplied transcript. Manual nonempty password input was suggested; its result has not yet been supplied.
+- **Unable to acquire user password:** observed twice in the supplied transcript. Further retry returned the same error. A loopback net use test subsequently produced the expected credential rejection.
 - **Empty 4625 results:** no matching events visible at the screenshot time. Verify time range, refresh, and confirm a test authentication was actually attempted before diagnosing logging failure.
 
 ## Success criteria
@@ -47,13 +55,14 @@ Use your own authorised lab computer.
 - [x] Access Security log and apply Event ID filter.
 - [x] Resolve privilege issue for audit policy query.
 - [x] Verify Logon success and failure auditing is enabled.
-- [ ] Complete a controlled authentication attempt.
-- [ ] Capture matching Event 4625.
-- [ ] Interpret status/substatus and logon type.
-- [ ] Preserve sanitised event evidence and write final findings.
+- [x] Complete a controlled authentication attempt (error 1326).
+- [x] Obtain matching failed-logon General-tab text from the user (Event 4625 context).
+- [x] Interpret status/substatus and logon type.
+- [x] Publish sanitised event transcription and findings.
+- [ ] Obtain timestamp, EventRecordID, and explicit System/EventID confirmation; preserve original event privately.
 
 ## Current finding
-Audit readiness has been verified. End-to-end failed-logon detection remains unvalidated. No malicious activity, successful login, containment, or remediation outcome has been demonstrated.
+The controlled local test produced a credential rejection and matching user-supplied failed-logon text. Status 0xC000006D indicates authentication failure; Sub Status 0xC0000064 narrows the cause to an unrecognised username. Logon Type 3 and 127.0.0.1 are consistent with the loopback network test. No malicious activity, successful login, SIEM alert, containment, or remediation outcome has been demonstrated. Original event export and exact timestamp/record correlation remain pending.
 
 ## References
 - [Microsoft: Event 4625](https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4625)
