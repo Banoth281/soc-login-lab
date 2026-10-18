@@ -1,4 +1,6 @@
 # Phishing Email Investigation Lab
+
+[![Phishing extractor tests](https://github.com/Banoth281/soc-login-lab/actions/workflows/phishing-tests.yml/badge.svg)](https://github.com/Banoth281/soc-login-lab/actions/workflows/phishing-tests.yml)
 **Author:** Santhosh Banoth | **Lab date:** 18 October 2026
 
 An offline investigation of a synthetic credential-phishing email using Windows PowerShell. Includes the exact uploaded sample, a reusable extractor, machine-readable evidence, and analyst findings.
@@ -45,7 +47,12 @@ The explicit request to reply with a username and password is the primary creden
 Authentication-Results is deliberately embedded fixture text. The extractor does not validate SPF, DKIM, DMARC, DNS, or the authenticity of that header. The analyst verdict and proposed containment actions are not automatic extractor outputs.
 
 ## Limits
-This is a simple plain-text fixture parser, not a complete MIME or forensic email-processing library. It does not decode attachments, base64/quoted-printable bodies, encoded headers, or multipart messages. Repeated headers and unusual URL punctuation require additional handling. No live email, malicious attachment, reputation lookup, delivery investigation, credential exposure, or containment was involved. The three assertions were run interactively; no phishing-specific CI suite is claimed.
+This is a simple plain-text fixture parser, not a complete MIME or forensic email-processing library. It does not decode attachments, base64/quoted-printable bodies, encoded headers, or multipart messages. Repeated headers and unusual URL punctuation require additional handling. No live email, malicious attachment, reputation lookup, delivery investigation, credential exposure, or containment was involved. The initial three assertions were run interactively. A subsequent ten-check automated suite covers this exact fixture plus rejection of a missing header/body separator; it does not establish support for general MIME email.
 
 ## Further work
-Add fixture-based automated tests, robust MIME parsing, negative cases, and safe report generation before applying this approach to more complex samples.
+Extend negative cases, add robust MIME parsing, and develop safe report generation before applying this approach to more complex samples.
+
+## Automated tests
+Run `./Test-LabEmail.ps1` from Windows PowerShell. It checks sample hash, sender, Reply-To, subject, folded header, exact URL, unverified authentication status, analyst-review verdict, JSON roundtrip, and malformed-input rejection. Execution happens in a temporary directory that is removed afterward; original evidence files are not overwritten.
+
+The GitHub workflow runs on relevant pushes and pull requests with read-only repository access. Hosted execution status is available through the badge above.
