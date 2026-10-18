@@ -20,7 +20,7 @@ $records | Export-Csv (Join-Path $folder 'lab-failed-logons.csv') -NoTypeInforma
 ```
 
 ## User-observed validation, 18 October 2026
-Results below were supplied as PowerShell console transcripts. They were not independently executed by the repository maintainer's automation. The detector function was exercised interactively; the packaged reader adds Hours and Account parameters around the demonstrated XML extraction logic and has not yet been rerun as a standalone file.
+Results below were supplied as PowerShell console transcripts. They were not independently executed by the repository maintainer's automation. The detector function was exercised interactively; the packaged reader adds Hours and Account parameters around the demonstrated XML extraction logic. A subsequent user-supplied transcript confirms the downloaded reader and detector ran together successfully on Windows.
 
 | Case | Observed alerts | Expected | Outcome |
 |---|---:|---:|---|
@@ -52,3 +52,20 @@ Synthetic test IPs 192.0.2.10 and 192.0.2.20 are documentation addresses. Synthe
 
 ## Next steps
 Rerun the packaged files on Windows, add automated assertions and input validation, then extend grouping to domain and destination host before multi-host use.
+
+## Packaged-script verification
+On 18 October 2026 the user downloaded both published scripts and ran them together in elevated Windows PowerShell with terminating error handling. Initial execution was blocked by the local execution policy. The user set RemoteSigned at Process scope only and reran successfully.
+
+Observed output:
+```text
+Events read: 2
+Alerts generated: 0
+Record IDs: 1832673, 1832671
+Account: SOC_Lab_Test_User
+Source IP: 127.0.0.1
+Logon type: 3
+Status: 0xc000006d
+Substatus: 0xc0000064
+```
+
+Outcome: packaged reader/detector integration passed for the two-event below-threshold case, based on the supplied console transcript. Synthetic positive and boundary checks were previously run interactively. No live five-event positive detection or scheduled monitoring was demonstrated. Process-scoped policy ends when the PowerShell session closes.
