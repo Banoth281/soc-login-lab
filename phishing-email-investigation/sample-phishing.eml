@@ -1,0 +1,22 @@
+﻿From: "IT Support" <support@helpdesk-example.invalid>
+To: analyst@example.invalid
+Reply-To: password-reset@external-example.invalid
+Date: Sun, 18 Oct 2026 09:00:00 +0000
+Subject: Urgent: Your account will be disabled
+Message-ID: <synthetic-001@helpdesk-example.invalid>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+X-Lab-Notice: Synthetic training fixture; no actual email delivery
+Authentication-Results: training.example.invalid;
+ spf=fail smtp.mailfrom=helpdesk-example.invalid;
+ dkim=none;
+ dmarc=fail header.from=helpdesk-example.invalid
+
+Your account will be disabled in 30 minutes.
+
+Verify your password immediately using this link:
+https://account-verification.invalid/login
+
+Reply with your username and password if verification fails.
+
+IT Support

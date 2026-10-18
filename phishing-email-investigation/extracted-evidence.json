@@ -1,0 +1,13 @@
+﻿{
+    "SHA256":  "A8B936DA03CF64F34DC185DD23DF89424BA6D372B0F3690EBF227B6E62565CEB",
+    "From":  "\"IT Support\" \u003csupport@helpdesk-example.invalid\u003e",
+    "ReplyTo":  "password-reset@external-example.invalid",
+    "Subject":  "Urgent: Your account will be disabled",
+    "AuthenticationResults":  "training.example.invalid; spf=fail smtp.mailfrom=helpdesk-example.invalid; dkim=none; dmarc=fail header.from=helpdesk-example.invalid",
+    "AuthenticationVerified":  false,
+    "URLs":  [
+                 "https://account-verification.invalid/login"
+             ],
+    "Verdict":  "Not assessed - analyst review required",
+    "NetworkRequestsMade":  false
+}

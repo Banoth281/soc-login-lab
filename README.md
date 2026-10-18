@@ -6,6 +6,9 @@
 
 A local SOC portfolio project by **Santhosh Banoth**. Analyse failed authentication events, explain their cause, and validate a repeated-failure detector with reproducible synthetic checks.
 
+## Phishing investigation
+[Explore the phishing email lab](phishing-email-investigation/README.md): exact synthetic email sample, PowerShell extraction, JSON evidence, analyst report, and three user-executed checks. Sample hash independently verified against uploaded bytes. This is a separate exercise from the Windows authentication lab.
+
 ## Start here
 - **[Read the case study](windows-event-investigation/CASE-STUDY.md)** — problem, investigation, outcomes, and limitations
 - **[Explore the Windows investigation](windows-event-investigation/README.md)** — commands and sanitised evidence
