@@ -24,8 +24,8 @@ Practical security investigations supported by evidence, reproducible PowerShell
 |---|---|---|
 | Windows collection | Two actual test-account failed-logon records read from the local Security log | [Event evidence](windows-event-investigation/evidence/05-controlled-logon-result.txt) · [Validation](windows-event-investigation/powershell/README.md) |
 | Windows detection | Zero alerts for two events, correctly below the five-event threshold | [Packaged-script verification](windows-event-investigation/powershell/README.md#packaged-script-verification) |
-| Windows automated tests | Historical v1: 8/8 passed locally; v2: 30/30 regression checks passed on Windows CI | [Test code](windows-event-investigation/powershell/Test-RepeatedFailures.ps1) · [v2 CI run](https://github.com/Banoth281/soc-login-lab/actions/runs/39117628101) |
-| Windows reporting | CSV export/reimport confirmed; HTML showed two events and zero alerts | [Report validation](windows-event-investigation/powershell/README.md#html-report) |
+| Windows automated tests | V2: 30/30 initial checks passed locally; 31/31 hosted checks passed after the path fix | [Test code](windows-event-investigation/powershell/Test-RepeatedFailures.ps1) · [Latest regression run](https://github.com/Banoth281/soc-login-lab/actions/runs/39119036887) |
+| Windows reporting | V2 HTML: 2 imported, 2 unique, 0 duplicates, 0 alerts; CSV/HTML hashes matched local manifest | [Report validation](windows-event-investigation/powershell/README.md#html-report) |
 | Phishing evidence | Original sample hash independently verified; five submitted files matched ZIP entries | [Validation record](phishing-email-investigation/VALIDATION.md) |
 | Phishing automated tests | Ten extraction checks passed on a hosted Windows runner | [Test code](phishing-email-investigation/Test-LabEmail.ps1) · [CI run](https://github.com/Banoth281/soc-login-lab/actions/runs/39115587909) |
 | Phishing reporting | HTML generation and encoding checks passed; user supplied generated report content | [Report test](phishing-email-investigation/Test-PhishingReport.ps1) · [CI run](https://github.com/Banoth281/soc-login-lab/actions/runs/39115864024) |
@@ -60,7 +60,7 @@ flowchart TD
 
 The detector flags at least five failures for the same destination host/domain/account/source group within an **inclusive five-minute rolling window**. It emits at most one alert per pair per invocation.
 
-Thirty v2 regression checks retain the original threshold and boundary checks and add domain/host isolation, event identity deduplication, strict input rejection, timezone/IPv6 normalisation, and report integration. [Migration instructions](windows-event-investigation/powershell/README.md#migration-from-the-old-csv) explain why old CSVs must be recollected with the upgraded reader. Historical actual-event results are preserved separately from synthetic v2 tests.
+Thirty-one v2 regression checks retain the original threshold and boundary checks and add domain/host isolation, event identity deduplication, strict input rejection, timezone/IPv6 normalisation, and report integration. [Migration instructions](windows-event-investigation/powershell/README.md#migration-from-the-old-csv) explain why old CSVs must be recollected with the upgraded reader. Historical actual-event results are preserved separately from synthetic v2 tests.
 
 [Investigation guide](windows-event-investigation/README.md) · [PowerShell tools](windows-event-investigation/powershell/README.md) · [Case study](windows-event-investigation/CASE-STUDY.md)
 
@@ -96,6 +96,9 @@ The extractor leaves the verdict for analyst review. Embedded SPF, DKIM, and DMA
 - No network requests, live email delivery, or containment actions are involved.
 
 [Project guide](phishing-email-investigation/README.md) · [Original sample](phishing-email-investigation/sample-phishing.eml) · [Analyst report](phishing-email-investigation/investigation-report.md) · [Case study](phishing-email-investigation/CASE-STUDY.md)
+
+## Local v2 verification
+The upgraded collector and corrected report generator ran successfully on the user's Windows computer. The CSV and HTML matched their recorded SHA-256 hashes. [Validation and integrity record](windows-event-investigation/evidence/LOCAL-V2-VALIDATION.md) includes the reported results; raw files remain local. Local tests: 30 original v2 cases. Hosted tests: 31 cases including the path fix.
 
 ## Skills demonstrated
 
