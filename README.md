@@ -1,4 +1,48 @@
-# Suspicious Login Detection and Investigation
+# SOC Authentication Investigation Lab
+
+[![PowerShell detector tests](https://github.com/Banoth281/soc-login-lab/actions/workflows/powershell-tests.yml/badge.svg)](https://github.com/Banoth281/soc-login-lab/actions/workflows/powershell-tests.yml)
+
+**Windows event investigation, PowerShell detection, automated tests, and HTML reporting.**
+
+A local SOC portfolio project by **Santhosh Banoth**. Analyse failed authentication events, explain their cause, and validate a repeated-failure detector with reproducible synthetic checks.
+
+## Start here
+- **[Read the case study](windows-event-investigation/CASE-STUDY.md)** — problem, investigation, outcomes, and limitations
+- **[Explore the Windows investigation](windows-event-investigation/README.md)** — commands and sanitised evidence
+- **[Run the PowerShell tools](windows-event-investigation/powershell/README.md)** — collection, detection, tests, and reports
+
+## Workflow
+```mermaid
+flowchart TD
+    A["Windows Security events"] --> B["Named XML fields"]
+    B --> C["CSV event records"]
+    C --> D["Repeated-failure detector"]
+    E["Synthetic fixtures"] --> D
+    D --> F["HTML findings report"]
+    E --> G["Eight automated checks"]
+    G --> H["GitHub Actions on Windows"]
+```
+
+## Verified outcomes
+| Component | Result | Evidence |
+|---|---|---|
+| Windows event collection | Two test-account failures read | [Event evidence](windows-event-investigation/evidence/05-controlled-logon-result.txt) and [validation notes](windows-event-investigation/powershell/README.md) |
+| Actual-data analysis | Zero alerts; two events are below the threshold of five | [PowerShell validation](windows-event-investigation/powershell/README.md) |
+| Automated synthetic tests | 8/8 passed on Windows | [Test suite](windows-event-investigation/powershell/Test-RepeatedFailures.ps1) |
+| Continuous integration | First Windows test job succeeded | [Successful run](https://github.com/Banoth281/soc-login-lab/actions/runs/39113190608) |
+| Reporting | CSV reimport and HTML display confirmed | [Report documentation](windows-event-investigation/powershell/README.md#html-report) |
+
+## Report contents
+The locally generated HTML report displays imported-event and threshold-alert counts, a UTC event table, detection findings, and interpretation limits. The reviewed report showed **2 imported events and 0 threshold alerts**. Original screenshots are not published.
+
+## Detection scope
+The PowerShell rule detects **at least five failures for the same account and source IP within an inclusive five-minute window**. An alert is an investigation lead. The actual-data case remained below threshold; positive detections were validated with synthetic records.
+
+The separate Python exercise below detects failures followed by a success using synthetic CSV data. Neither exercise claims production deployment or confirmed compromise.
+
+---
+
+## Original Python exercise: suspicious login sequences
 
 A beginner SOC portfolio lab using Python to detect suspicious login sequences and document investigation decisions.
 
