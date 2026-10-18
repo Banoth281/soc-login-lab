@@ -1,0 +1,30 @@
+Evidence type: user-provided command output, transcribed from conversation.
+Date: 2026-10-18. Exact command execution timestamps were not supplied.
+Personal user-directory prompt omitted; command output retained.
+
+Initial non-elevated attempt:
+> auditpol /get /subcategory:"Logon"
+Error 0x00000522 occurred:
+A required privilege is not held by the client.
+
+Subsequent elevated attempt:
+> auditpol /get /subcategory:"Logon"
+System audit policy
+Category/Subcategory                      Setting
+Logon/Logoff
+  Logon                                   Success and Failure
+
+Controlled test attempt 1:
+> runas /user:.\\SOC_Lab_Test_User "cmd.exe"
+Enter the password for .\\SOC_Lab_Test_User:
+RUNAS ERROR: Unable to acquire user password
+
+Controlled test attempt 2:
+> runas /user:.\\SOC_Lab_Test_User "cmd.exe"
+Enter the password for .\\SOC_Lab_Test_User:
+RUNAS ERROR: Unable to acquire user password
+
+Interpretation:
+Audit policy query succeeded when elevated.
+The runas results do not establish a completed authentication attempt.
+No subsequent Event 4625 capture or successful test result was supplied.
