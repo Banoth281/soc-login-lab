@@ -24,3 +24,8 @@ jobs:
         run: |
           $ErrorActionPreference = 'Stop'
           & './phishing-email-investigation/Test-LabEmail.ps1'
+      - name: Check HTML report generation and encoding
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          & './phishing-email-investigation/Test-PhishingReport.ps1'
