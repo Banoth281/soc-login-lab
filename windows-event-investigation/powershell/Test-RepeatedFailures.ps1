@@ -179,6 +179,22 @@ foreach ($test in $tests) {
         Write-Output "FAIL: $($test.Name) - $($_.Exception.Message)"
     }
 }
+
+$extraTests += @{Name='Relative report paths use PowerShell location'; Run={
+    $temp=Join-Path ([IO.Path]::GetTempPath()) ('windows-relative-'+[guid]::NewGuid())
+    New-Item -ItemType Directory -Path $temp | Out-Null
+    $generator=Join-Path $PSScriptRoot 'New-InvestigationReport.ps1'
+    try {
+        @(New-Fixture @(0,30)) | Export-Csv (Join-Path $temp 'events.csv') -NoTypeInformation -Encoding UTF8
+        Push-Location $temp
+        try {
+            & $generator -CsvPath './events.csv' -OutputPath './relative-report.html' | Out-Null
+            if(-not (Test-Path -LiteralPath (Join-Path $temp 'relative-report.html'))){throw 'Report not saved in PowerShell folder'}
+            Assert-Rejected { & $generator -CsvPath './events.csv' -OutputPath './events.csv' } 'overwrite'
+        } finally { Pop-Location }
+    } finally { Remove-Item -LiteralPath $temp -Recurse -Force }
+}}
+
 foreach($test in $extraTests) {
     try { & $test.Run; Write-Output "PASS: $($test.Name)" }
     catch { $failed++; Write-Output "FAIL: $($test.Name) - $($_.Exception.Message)" }
