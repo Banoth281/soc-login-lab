@@ -24,3 +24,6 @@ Original selected files are uploaded without byte changes. The broken .backup fi
 
 ## Hosted automated validation
 On 18 October 2026, the Windows extractor-tests job completed successfully in [GitHub Actions run 39115587909](https://github.com/Banoth281/soc-login-lab/actions/runs/39115587909), testing commit 7ac234ca37edce1288a73e35fa1b5a454ef8a218. The suite executes ten assertions covering exact hash and extracted values, folded headers, JSON roundtrip, analyst-review status, and missing-separator rejection. This hosted run supplements the earlier three user-executed assertions. It validates the synthetic fixture, not a live email investigation or general MIME support.
+
+## HTML report validation
+The report generator and its encoding checks passed on Windows in [run 39115864024](https://github.com/Banoth281/soc-login-lab/actions/runs/39115864024). The user subsequently supplied report content showing the matching sample hash, extracted fields, analyst verdict, fixture labels, limitations, and generated UTC time 2026-10-18 09:35:14Z. This confirms content generation; visual browser layout has not been reviewed from a screenshot.
