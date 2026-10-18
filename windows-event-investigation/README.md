@@ -5,8 +5,10 @@
 
 A free local SOC investigation exercise using Windows Event Viewer and auditpol on an 8 GB RAM Windows computer. This folder records the actual work completed during the session. The repository's other simulated-data exercises are separate; their results do not validate this live Windows test.
 
+[Read the case study](CASE-STUDY.md) · [Explore PowerShell tools and tests](powershell/README.md)
+
 ## Objective
-Generate one controlled failed logon against a nonexistent local test account, find Event 4625, interpret the failure fields, and document the outcome. No Azure, Sentinel, Wazuh deployment, production incident, is claimed. Local event recording was demonstrated through user-supplied text; no SIEM alert was tested.
+Generate one controlled failed logon against a nonexistent local test account, find Event 4625, interpret the failure fields, and document the outcome. No Azure, Sentinel, Wazuh deployment, or production incident is claimed. Local event recording was demonstrated through user-supplied text; no SIEM alert was tested.
 
 ## Confirmed actions and evidence
 | Action | Observed result | Evidence |
@@ -40,10 +42,10 @@ Use your own authorised lab computer.
    `runas /user:.\\SOC_Lab_Test_User "cmd.exe"`
 5. At the password prompt, manually enter a made-up, nonempty test password. Input is hidden. Do not use an actual account password.
 6. Record the exact runas outcome. An input-acquisition error is not proof of authentication failure.
-7. The working alternative on this machine was `net use \\\\127.0.0.1\\IPC$ /user:%COMPUTERNAME%\\SOC_Lab_Test_User *`. Enter a made-up password once. Error 1326 was observed.
+7. The working alternative on this machine was `net use \\127.0.0.1\IPC$ /user:%COMPUTERNAME%\SOC_Lab_Test_User *`. Enter a made-up password once. Error 1326 was observed.
 8. In Event Viewer, open Windows Logs > Security, filter Event ID 4625, and refresh.
-8. If an event appears, record timestamp and timezone, event record ID, Failure Reason, Status, Sub Status, and Logon Type. Confirm the target matches the lab account.
-9. Retain original event evidence privately. Publish only reviewed, sanitised evidence and explain any redactions.
+9. If an event appears, record timestamp and timezone, event record ID, Failure Reason, Status, Sub Status, and Logon Type. Confirm the target matches the lab account.
+10. Retain original event evidence privately. Publish only reviewed, sanitised evidence and explain any redactions.
 
 ## Troubleshooting
 - **0x00000522:** initial command lacked the required privilege. Retrying elevated successfully returned the audit policy.
@@ -63,7 +65,7 @@ Use your own authorised lab computer.
 - [ ] Optional evidence-preservation follow-up: retain the original EVTX privately.
 
 ## Current finding
-The controlled local test produced a credential rejection and matching user-supplied failed-logon text. Status 0xC000006D indicates authentication failure; Sub Status 0xC0000064 narrows the cause to an unrecognised username. Logon Type 3 and 127.0.0.1 are consistent with the loopback network test. No malicious activity, successful login, SIEM alert, containment, or remediation outcome has been demonstrated. Event identifier, timestamp, and record ID are now documented from supplied XML. Original EVTX evidence and an independent command timestamp have not been supplied. The single-event investigation is complete within this evidence scope; repeated-failure detection, automated alerting, and response actions were not tested.
+The controlled local test produced a credential rejection and matching user-supplied failed-logon text. Status 0xC000006D indicates authentication failure; Sub Status 0xC0000064 narrows the cause to an unrecognised username. Logon Type 3 and 127.0.0.1 are consistent with the loopback network test. No malicious activity, successful login, SIEM alert, containment, or remediation outcome has been demonstrated. Event identifier, timestamp, and record ID are now documented from supplied XML. Original EVTX evidence and an independent command timestamp have not been supplied. The single-event investigation is complete within this evidence scope; live above-threshold detection and response actions were not tested. The subsequent [PowerShell extension](powershell/README.md) validates repeated-failure logic with synthetic tests and automated CI.
 
 ## References
 - [Microsoft: Event 4625](https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4625)
