@@ -59,11 +59,13 @@ Review account names and addresses before sharing this report.</p>
 <small>Generated UTC: $generated | Event timestamps shown in UTC</small>
 </main></body></html>
 "@
-$destination = [IO.Path]::GetFullPath($OutputPath)
-if ($destination -eq [IO.Path]::GetFullPath($CsvPath)) { throw 'Output must not overwrite input CSV.' }
+$destination = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($OutputPath)
+if ($destination -eq $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($CsvPath)) { throw 'Output must not overwrite input CSV.' }
 $parent = Split-Path -Parent $destination
 if (-not (Test-Path -LiteralPath $parent)) { throw "Output folder does not exist: $parent" }
 $html | Set-Content -LiteralPath $destination -Encoding UTF8
-Write-Output "Events imported: $($records.Count)"
+Write-Output "Events imported: $importedCount"
+Write-Output "Unique events: $($records.Count)"
+Write-Output "Duplicates removed: $duplicatesRemoved"
 Write-Output "Threshold alerts: $($alerts.Count)"
 Write-Output "Report saved: $destination"
