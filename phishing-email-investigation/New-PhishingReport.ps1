@@ -20,14 +20,15 @@ function Encode-Text {
     param($Value)
     [System.Net.WebUtility]::HtmlEncode([string]$Value)
 }
-$rows = @(
-    @('SHA-256', $evidence.SHA256)
-    @('From', $evidence.From)
-    @('Reply-To', $evidence.ReplyTo)
-    @('Subject', $evidence.Subject)
-    @('Authentication header - unverified', $evidence.AuthenticationResults)
-) | ForEach-Object {
-    '<tr><th>' + (Encode-Text $_[0]) + '</th><td>' + (Encode-Text $_[1]) + '</td></tr>'
+$fields = [ordered]@{
+    'SHA-256' = $evidence.SHA256
+    'From' = $evidence.From
+    'Reply-To' = $evidence.ReplyTo
+    'Subject' = $evidence.Subject
+    'Authentication header - unverified' = $evidence.AuthenticationResults
+}
+$rows = $fields.GetEnumerator() | ForEach-Object {
+    '<tr><th>' + (Encode-Text $_.Key) + '</th><td>' + (Encode-Text $_.Value) + '</td></tr>'
 }
 $urlItems = @($evidence.URLs | ForEach-Object {
     '<li><code>' + (Encode-Text $_) + '</code></li>'
