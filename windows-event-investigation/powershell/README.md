@@ -63,7 +63,7 @@ The report validates and deduplicates input, shows unique and imported counts, a
 ```
 No log access, admin rights, or login attempts are required. Thirty cases retain the original threshold/window/account/source checks and add host/domain separation, duplicate/conflict handling, timezone and IPv6 normalisation, required-field rejection, configurable settings, later-window detection, and report integration.
 
-Hosted v2 execution: pending verification. No local v2 PowerShell run has been claimed in the authoring environment.
+Hosted v2 verification: **30/30 regression cases passed** on Windows in [run 39117628101](https://github.com/Banoth281/soc-login-lab/actions/runs/39117628101), testing commit 4e8f40eb252d95aff25c9bbde221a039821a6206. This includes duplicate handling, context isolation, validation, and report integration. No local v2 PowerShell run has been claimed in the authoring environment.
 
 ## Evidence and provenance
 [Historical v1 validation](VALIDATION-V1.md) preserves the two actual user-observed test events, eight original tests, successful v1 packaged run, and reviewed v1 HTML screenshot. Those are historical results, not proof that v2 has been run against the user's machine. The v2 suite uses synthetic records and temporary CSV/HTML files.
