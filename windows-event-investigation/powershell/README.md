@@ -76,3 +76,8 @@ Hosted v2 verification: **30/30 regression cases passed** on Windows in [run 391
 - Inputs and reports may contain machine/account identifiers; review before sharing.
 - Hard-link aliases are not explicitly checked by the report's input/output path guard.
 - There is no SIEM deployment, live above-threshold attack, or containment claim.
+
+## Local v2 verification and path fix
+The user subsequently ran all 30 original v2 checks successfully and collected 2 actual records, 2 unique records, and 0 alerts with host/domain context. The CSV was saved locally. User console output also confirmed HTML generation, but a relative output path initially resolved to the process working directory (System32) instead of PowerShell's location.
+
+The generator now uses PowerShell provider path resolution for both output and input-path protection. Console counts distinguish imported, unique, and duplicate records. A new regression changes PowerShell's location before generating a relative-path report. **31/31 checks passed** in [Windows CI run 39119036887](https://github.com/Banoth281/soc-login-lab/actions/runs/39119036887). User execution of the corrected generator and visual v2 HTML review remain pending.
