@@ -1,7 +1,7 @@
 # Windows Failed-Logon Investigation
 **Author:** Santhosh Banoth  
 **Lab date:** 18 October 2026  
-**Status:** Controlled failed-logon record obtained and interpreted from user-supplied event text. Original event export and timestamp/record-ID validation remain pending.
+**Status:** Completed for the single-event lab scope using user-supplied event text and XML. Original EVTX export has not been supplied.
 
 A free local SOC investigation exercise using Windows Event Viewer and auditpol on an 8 GB RAM Windows computer. This folder records the actual work completed during the session. The repository's other simulated-data exercises are separate; their results do not validate this live Windows test.
 
@@ -28,7 +28,7 @@ After runas repeatedly failed to acquire password input, a single loopback IPC$ 
 
 This supports an expected network authentication failure for an unrecognised account. It is authorised lab activity, not evidence of intrusion. See [sanitised command and event evidence](evidence/05-controlled-logon-result.txt).
 
-The supplied General-tab text is consistent with Event 4625. The XML event identifier, event timestamp, and record ID were not provided, so exact correlation and original-record verification remain pending.
+The subsequent supplied XML confirms EventID **4625**, EventRecordID **1832673**, and UTC time **2026-10-18T08:18:19.3299718Z** (displayed local time **18 October 2026, 13:48:19**, consistent with UTC+05:30). Account, source address, source port, and failure fields match the earlier event text. This is verification within user-supplied evidence, not independent access to the machine.
 
 ## Reproduction and next steps
 Use your own authorised lab computer.
@@ -59,10 +59,11 @@ Use your own authorised lab computer.
 - [x] Obtain matching failed-logon General-tab text from the user (Event 4625 context).
 - [x] Interpret status/substatus and logon type.
 - [x] Publish sanitised event transcription and findings.
-- [ ] Obtain timestamp, EventRecordID, and explicit System/EventID confirmation; preserve original event privately.
+- [x] Obtain timestamp, EventRecordID, and explicit System/EventID confirmation from supplied XML.
+- [ ] Optional evidence-preservation follow-up: retain the original EVTX privately.
 
 ## Current finding
-The controlled local test produced a credential rejection and matching user-supplied failed-logon text. Status 0xC000006D indicates authentication failure; Sub Status 0xC0000064 narrows the cause to an unrecognised username. Logon Type 3 and 127.0.0.1 are consistent with the loopback network test. No malicious activity, successful login, SIEM alert, containment, or remediation outcome has been demonstrated. Original event export and exact timestamp/record correlation remain pending.
+The controlled local test produced a credential rejection and matching user-supplied failed-logon text. Status 0xC000006D indicates authentication failure; Sub Status 0xC0000064 narrows the cause to an unrecognised username. Logon Type 3 and 127.0.0.1 are consistent with the loopback network test. No malicious activity, successful login, SIEM alert, containment, or remediation outcome has been demonstrated. Event identifier, timestamp, and record ID are now documented from supplied XML. Original EVTX evidence and an independent command timestamp have not been supplied. The single-event investigation is complete within this evidence scope; repeated-failure detection, automated alerting, and response actions were not tested.
 
 ## References
 - [Microsoft: Event 4625](https://learn.microsoft.com/windows/security/threat-protection/auditing/event-4625)
