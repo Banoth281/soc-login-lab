@@ -1,0 +1,41 @@
+# Controlled failed-logon result
+Source: event General-tab text and command output supplied by the user on 18 October 2026. This is a sanitised transcription, not an EVTX export or independently verified capture. Host/domain identifiers replaced with [LAB-HOST]. Event timestamp, EventRecordID, and XML System/EventID were not supplied.
+
+Command:
+net use \\127.0.0.1\IPC$ /user:%COMPUTERNAME%\SOC_Lab_Test_User *
+
+Observed command result:
+System error 1326 has occurred.
+The user name or password is incorrect.
+
+User-supplied event:
+An account failed to log on.
+Subject Security ID: NULL SID
+Subject Account Name: -
+Subject Account Domain: -
+Subject Logon ID: 0x0
+Logon Type: 3
+Target Security ID: NULL SID
+Target Account Name: SOC_Lab_Test_User
+Target Account Domain: [LAB-HOST]
+Failure Reason: Unknown user name or bad password.
+Status: 0xC000006D
+Sub Status: 0xC0000064
+Caller Process ID: 0x0
+Caller Process Name: -
+Workstation Name: [LAB-HOST]
+Source Network Address: 127.0.0.1
+Source Port: 54345
+Logon Process: NtLmSsp
+Authentication Package: NTLM
+Transited Services: -
+Package Name (NTLM only): -
+Key Length: 0
+
+Analysis:
+- Type 3 indicates network logon, consistent with IPC$ access.
+- 0xC000006D is a general authentication failure.
+- 0xC0000064 indicates an unrecognised/nonexistent username.
+- Loopback source and matching test account support correlation with the authorised local test.
+- This demonstrates one expected failed-logon record based on supplied text; it does not demonstrate an attack, successful login, or SIEM alert.
+- Exact time/record correlation and original event preservation remain pending.
