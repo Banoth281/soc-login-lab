@@ -5,6 +5,8 @@
 
 An offline investigation of a synthetic credential-phishing email using Windows PowerShell. Includes the exact uploaded sample, a reusable extractor, machine-readable evidence, and analyst findings.
 
+[Read the case study](CASE-STUDY.md) - concise investigation, findings, validation, and limitations.
+
 ## Results
 | Check | Result | Evidence source |
 |---|---|---|
@@ -62,4 +64,4 @@ Run `./New-PhishingReport.ps1` next to analysis.json and extracted-evidence.json
 
 The report combines extracted headers and hash with the separate analyst assessment. All dynamic text is HTML-encoded; extracted URLs are plain text. The observations and response guidance are specific to this synthetic fixture. A matching valid hash is required across both JSON inputs.
 
-`./Test-PhishingReport.ps1` validates report generation, key evidence, encoded markup, verdict display, and absence of anchor links using a temporary directory. GitHub CI runs this check alongside the ten extraction checks. Browser visual verification remains pending.
+`./Test-PhishingReport.ps1` validates report generation, key evidence, encoded markup, verdict display, and absence of anchor links using a temporary directory. GitHub CI runs this check alongside the ten extraction checks. Report generation is confirmed by user-supplied output dated 18 October 2026 (generated 09:35:14Z). Browser visual verification remains pending.
