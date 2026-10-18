@@ -73,4 +73,23 @@ Outcome: packaged reader/detector integration passed for the two-event below-thr
 ## Automated synthetic checks
 Run `./Test-RepeatedFailures.ps1` from this folder. It loads the detector relative to its own path and checks eight scenarios: positive threshold, below threshold, inclusive/exclusive time boundary, source isolation, account isolation, unsorted input, and empty input. It also validates key alert details for positive cases. Any failing assertion raises a terminating error. This script does not access real logs or generate authentication attempts.
 
-Status: test script published; execution of this new automated suite is pending. PowerShell is unavailable in the authoring environment. Earlier interactive validation and packaged reader verification remain documented separately.
+Status: all eight automated checks passed on the user's Windows PowerShell environment on 18 October 2026, according to the supplied console transcript. PowerShell is unavailable in the authoring environment; these are user-executed results. Earlier interactive validation and packaged reader verification remain documented separately.
+
+
+## Automated suite execution evidence
+User-supplied console output, 18 October 2026:
+```text
+Get-ExecutionPolicy
+RemoteSigned
+
+PASS: Five failures trigger
+PASS: Four failures do not trigger
+PASS: Inclusive 300-second boundary
+PASS: 301 seconds is outside window
+PASS: Sources remain separate
+PASS: Accounts remain separate
+PASS: Unsorted input works
+PASS: Empty input gives no alerts
+8/8 tests passed
+```
+The execution policy was set to RemoteSigned at Process scope. These automated checks use synthetic data; they do not demonstrate eight real attacks or production detection performance.
