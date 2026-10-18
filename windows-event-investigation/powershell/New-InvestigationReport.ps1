@@ -1,37 +1,26 @@
 # Reads an existing lab CSV. Does not query Windows logs or generate login attempts.
 param(
     [string]$CsvPath = (Join-Path $env:USERPROFILE 'SOC-Lab-Reports\lab-failed-logons.csv'),
-    [string]$OutputPath = (Join-Path $env:USERPROFILE 'SOC-Lab-Reports\investigation-report.html')
+    [string]$OutputPath = (Join-Path $env:USERPROFILE 'SOC-Lab-Reports\investigation-report.html'),
+    [ValidateRange(2,1000000)][int]$Threshold = 5,
+    [ValidateRange(1,10080)][int]$WindowMinutes = 5
 )
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'Find-RepeatedFailures.ps1')
 $records = @(Import-Csv -LiteralPath $CsvPath)
-$required = @('TimeUTC','RecordID','Account','SourceIP','LogonType','Status','SubStatus')
 if ($records.Count -eq 0) { throw 'CSV has no event rows.' }
-foreach ($column in $required) {
-    if ($records[0].PSObject.Properties.Name -notcontains $column) {
-        throw "Missing CSV column: $column"
-    }
-}
-foreach ($record in $records) {
-    if ([string]::IsNullOrWhiteSpace($record.Account) -or
-        [string]::IsNullOrWhiteSpace($record.SourceIP)) {
-        throw 'Account and SourceIP must be populated.'
-    }
-    $record.TimeUTC = [datetimeoffset]::Parse(
-        $record.TimeUTC,
-        [Globalization.CultureInfo]::InvariantCulture
-    ).UtcDateTime
-}
-$alerts = @(Find-RepeatedFailures -Records $records)
+$importedCount = $records.Count
+$records = @(ConvertTo-FailedLogonRecords -Records $records)
+$duplicatesRemoved = $importedCount - $records.Count
+$alerts = @(Find-RepeatedFailures -Records $records -Threshold $Threshold -WindowMinutes $WindowMinutes)
 $eventRows = $records | Select-Object @{
-    Name='TimeUTC'; Expression={$_.TimeUTC.ToString('o')}
-},RecordID,Account,SourceIP,LogonType,Status,SubStatus
+    Name='TimeUTC'; Expression={$_.TimeUTC}
+},RecordID,Computer,Domain,Account,SourceIP,LogonType,Status,SubStatus
 $eventsHtml = ($eventRows | ConvertTo-Html -Fragment) -join [Environment]::NewLine
 if ($alerts.Count -gt 0) {
     $alertsHtml = ($alerts | ConvertTo-Html -Fragment) -join [Environment]::NewLine
 } else {
-    $alertsHtml = '<p>No account/source pair met the configured threshold in the supplied records.</p>'
+    $alertsHtml = '<p>No host/domain/account/source group met the configured threshold in the supplied records.</p>'
 }
 $generated = [datetime]::UtcNow.ToString('u')
 $html = @"
@@ -54,15 +43,16 @@ small{color:#526176}@media print{body{padding:0;background:white}main{padding:0}
 <body><main>
 <h1>Windows Failed-Logon Investigation</h1>
 <p>Local lab evidence review and repeated-failure analysis</p>
-<div class="summary"><strong>Events imported: $($records.Count)</strong> |
+<div class="summary"><strong>Events imported: $importedCount</strong> |
+<strong>Unique events: $($records.Count)</strong> | Duplicates removed: $duplicatesRemoved |
 <strong>Threshold alerts: $($alerts.Count)</strong><br>
-Rule: at least 5 failures for the same account and source IP within an inclusive 5-minute window.</div>
+Rule: at least $Threshold failures for the same destination host, domain, account and source IP within an inclusive $WindowMinutes-minute window.</div>
 <h2>Detection findings</h2><div class="table-wrap">$alertsHtml</div>
 <h2>Collected events</h2><div class="table-wrap">$eventsHtml</div>
 <h2>Interpretation and limits</h2>
 <p>Zero alerts means the threshold was not reached in this CSV; it does not establish that a system is secure.
 An alert identifies a pattern requiring investigation, not a confirmed attack.
-The analysis assumes records are unique and from one host/domain. One alert is emitted per account/source pair per report.
+Input is validated and deduplicated by host, channel, record ID and UTC timestamp. One alert is emitted per host/domain/account/source group per report. Case-insensitive Windows names are grouped together.
 This is an on-demand report, not continuous monitoring.</p>
 <p>Input is a local CSV; no independent verification of its origin is performed.
 Review account names and addresses before sharing this report.</p>
@@ -70,6 +60,7 @@ Review account names and addresses before sharing this report.</p>
 </main></body></html>
 "@
 $destination = [IO.Path]::GetFullPath($OutputPath)
+if ($destination -eq [IO.Path]::GetFullPath($CsvPath)) { throw 'Output must not overwrite input CSV.' }
 $parent = Split-Path -Parent $destination
 if (-not (Test-Path -LiteralPath $parent)) { throw "Output folder does not exist: $parent" }
 $html | Set-Content -LiteralPath $destination -Encoding UTF8
