@@ -93,3 +93,6 @@ PASS: Empty input gives no alerts
 8/8 tests passed
 ```
 The execution policy was set to RemoteSigned at Process scope. These automated checks use synthetic data; they do not demonstrate eight real attacks or production detection performance.
+
+## HTML report
+Run `./New-InvestigationReport.ps1` alongside the detector. It reads the lab CSV from the user's SOC-Lab-Reports folder and writes investigation-report.html there. Override -CsvPath and -OutputPath if needed. Includes event table, alert summary, UTC timestamps, and limitations. Review account and address data before sharing. Status: script published; Windows execution and browser layout validation pending.
