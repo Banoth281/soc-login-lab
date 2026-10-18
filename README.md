@@ -1,122 +1,161 @@
-# SOC Authentication Investigation Lab
+# SOC Investigation & Detection Portfolio
+**Santhosh Banoth | SOC Analyst**
 
-[![PowerShell detector tests](https://github.com/Banoth281/soc-login-lab/actions/workflows/powershell-tests.yml/badge.svg)](https://github.com/Banoth281/soc-login-lab/actions/workflows/powershell-tests.yml)
+Practical security investigations supported by evidence, reproducible PowerShell tools, analyst reports, and automated Windows tests.
 
-**Windows event investigation, PowerShell detection, automated tests, and HTML reporting.**
+[![Windows detector tests](https://github.com/Banoth281/soc-login-lab/actions/workflows/powershell-tests.yml/badge.svg)](https://github.com/Banoth281/soc-login-lab/actions/workflows/powershell-tests.yml)
+[![Phishing extractor tests](https://github.com/Banoth281/soc-login-lab/actions/workflows/phishing-tests.yml/badge.svg)](https://github.com/Banoth281/soc-login-lab/actions/workflows/phishing-tests.yml)
 
-A local SOC portfolio project by **Santhosh Banoth**. Analyse failed authentication events, explain their cause, and validate a repeated-failure detector with reproducible synthetic checks.
+[GitHub profile](https://github.com/Banoth281) · [LinkedIn](https://www.linkedin.com/in/banoth281/)
 
-## Phishing investigation
-[Explore the phishing email lab](phishing-email-investigation/README.md): exact synthetic email sample, PowerShell extraction, JSON evidence, analyst report, and three user-executed checks. Sample hash independently verified against uploaded bytes. This is a separate exercise from the Windows authentication lab.
+## Recruiter overview
 
-## Start here
-- **[Read the case study](windows-event-investigation/CASE-STUDY.md)** — problem, investigation, outcomes, and limitations
-- **[Explore the Windows investigation](windows-event-investigation/README.md)** — commands and sanitised evidence
-- **[Run the PowerShell tools](windows-event-investigation/powershell/README.md)** — collection, detection, tests, and reports
+| Project | Security question | Demonstrated work | Case study |
+|---|---|---|---|
+| Windows authentication investigation | Why did a logon fail, and when should repeated failures be flagged? | Event 4625 analysis, XML extraction, rolling-window detection, CSV/HTML reporting, automated tests | [Windows case study](windows-event-investigation/CASE-STUDY.md) |
+| Phishing email investigation | What evidence supports a credential-phishing assessment? | Sample hashing, header and URL extraction, separate analyst judgment, JSON/HTML reporting, automated tests | [Phishing case study](phishing-email-investigation/CASE-STUDY.md) |
+| Python authentication exercise | Which accounts have repeated failures followed by a success? | Synthetic CSV analysis, grouped detection, investigation notes | [Python script](detect_logins.py) · [Notes](investigation_notes.txt) |
 
-## Workflow
+**Suggested review:** read either case study, inspect its evidence, then open the linked test run. Professional experience is described on my profile; the projects here are personal lab exercises.
+
+## Verified results
+
+| Area | Observed outcome | Evidence |
+|---|---|---|
+| Windows collection | Two actual test-account failed-logon records read from the local Security log | [Event evidence](windows-event-investigation/evidence/05-controlled-logon-result.txt) · [Validation](windows-event-investigation/powershell/README.md) |
+| Windows detection | Zero alerts for two events, correctly below the five-event threshold | [Packaged-script verification](windows-event-investigation/powershell/README.md#packaged-script-verification) |
+| Windows automated tests | 8/8 synthetic checks passed locally; hosted Windows test job passed | [Test code](windows-event-investigation/powershell/Test-RepeatedFailures.ps1) · [CI run](https://github.com/Banoth281/soc-login-lab/actions/runs/39113190608) |
+| Windows reporting | CSV export/reimport confirmed; HTML showed two events and zero alerts | [Report validation](windows-event-investigation/powershell/README.md#html-report) |
+| Phishing evidence | Original sample hash independently verified; five submitted files matched ZIP entries | [Validation record](phishing-email-investigation/VALIDATION.md) |
+| Phishing automated tests | Ten extraction checks passed on a hosted Windows runner | [Test code](phishing-email-investigation/Test-LabEmail.ps1) · [CI run](https://github.com/Banoth281/soc-login-lab/actions/runs/39115587909) |
+| Phishing reporting | HTML generation and encoding checks passed; user supplied generated report content | [Report test](phishing-email-investigation/Test-PhishingReport.ps1) · [CI run](https://github.com/Banoth281/soc-login-lab/actions/runs/39115864024) |
+
+Local Windows execution evidence comes from supplied console transcripts, event text/XML, and screenshots. Hosted CI results are separately linked. The original Windows EVTX was not supplied. Phishing HTML content is verified; browser visual layout has not been reviewed from a screenshot.
+
+## 1. Windows authentication investigation
+
+### Investigation and detection workflow
+
 ```mermaid
 flowchart TD
-    A["Windows Security events"] --> B["Named XML fields"]
-    B --> C["CSV event records"]
-    C --> D["Repeated-failure detector"]
-    E["Synthetic fixtures"] --> D
-    D --> F["HTML findings report"]
-    E --> G["Eight automated checks"]
-    G --> H["GitHub Actions on Windows"]
+    A["Local Security log: Event 4625"] --> B["Extract named XML fields"]
+    B --> C["Review failure reason and context"]
+    B --> D["Export CSV records"]
+    D --> E["Group by account and source IP"]
+    E --> F{"Five failures within five minutes?"}
+    F -->|Yes| G["Flag pattern for investigation"]
+    F -->|No| H["Report below-threshold result"]
+    G --> I["HTML findings report"]
+    H --> I
 ```
 
-## Verified outcomes
-| Component | Result | Evidence |
-|---|---|---|
-| Windows event collection | Two test-account failures read | [Event evidence](windows-event-investigation/evidence/05-controlled-logon-result.txt) and [validation notes](windows-event-investigation/powershell/README.md) |
-| Actual-data analysis | Zero alerts; two events are below the threshold of five | [PowerShell validation](windows-event-investigation/powershell/README.md) |
-| Automated synthetic tests | 8/8 passed on Windows | [Test suite](windows-event-investigation/powershell/Test-RepeatedFailures.ps1) |
-| Continuous integration | First Windows test job succeeded | [Successful run](https://github.com/Banoth281/soc-login-lab/actions/runs/39113190608) |
-| Reporting | CSV reimport and HTML display confirmed | [Report documentation](windows-event-investigation/powershell/README.md#html-report) |
+### Findings
 
-## Report contents
-The locally generated HTML report displays imported-event and threshold-alert counts, a UTC event table, detection findings, and interpretation limits. The reviewed report showed **2 imported events and 0 threshold alerts**. Original screenshots are not published.
+- Event **4625**, record **1832673**, at **2026-10-18T08:18:19.3299718Z**.
+- Logon Type **3** and source **127.0.0.1** are consistent with the authorised local network test.
+- Status **0xC000006D** indicates authentication failure; substatus **0xC0000064** narrows it to an unrecognised username.
+- PowerShell collected two test-account events. Neither the actual dataset nor this lab demonstrates a live above-threshold attack.
 
-## Detection scope
-The PowerShell rule detects **at least five failures for the same account and source IP within an inclusive five-minute window**. An alert is an investigation lead. The actual-data case remained below threshold; positive detections were validated with synthetic records.
+### Rule and testing
 
-The separate Python exercise below detects failures followed by a success using synthetic CSV data. Neither exercise claims production deployment or confirmed compromise.
+The detector flags at least five failures for the same account/source pair within an **inclusive five-minute rolling window**. It emits at most one alert per pair per invocation.
 
----
+Eight checks cover positive and negative thresholds, the exact 300-second boundary, exclusion at 301 seconds, source/account isolation, unsorted input, and empty input.
 
-## Original Python exercise: suspicious login sequences
+[Investigation guide](windows-event-investigation/README.md) · [PowerShell tools](windows-event-investigation/powershell/README.md) · [Case study](windows-event-investigation/CASE-STUDY.md)
 
-A beginner SOC portfolio lab using Python to detect suspicious login sequences and document investigation decisions.
+## 2. Phishing email investigation
 
-## Purpose
+### Evidence and assessment workflow
 
-Detect five or more failed logins followed by a successful login for the same account and source IP within five minutes.
+```mermaid
+flowchart TD
+    A["Synthetic email fixture"] --> B["SHA-256 identification"]
+    A --> C["Extract headers and body URLs"]
+    B --> D["Extracted evidence JSON"]
+    C --> D
+    A --> E["Analyst reviews message context"]
+    E --> F["Separate assessment JSON"]
+    D --> G["Associate records by sample hash"]
+    F --> G
+    G --> H["HTML investigation report"]
+```
 
-An alert indicates activity to investigate, not proof of compromise.
+### Findings
 
-## Tools
+The fixture asks the recipient to disclose a username and password, threatens account disablement, and uses different sender, reply, and link domains. The explicit credential request supports the analyst's training-scenario verdict; domain differences alone are insufficient.
 
-- Python standard library
-- CSV login records
-- Windows Command Prompt
+The extractor leaves the verdict for analyst review. Embedded SPF, DKIM, and DMARC values are **synthetic, unverified header text**.
 
-No additional Python packages are required.
+### Evidence handling and reporting
 
-## Files
+- Exact original sample bytes and SHA-256 retained.
+- Extracted evidence and analyst assessment stored separately.
+- Report input is HTML-encoded; URLs appear as text rather than links.
+- Automated tests use temporary folders and do not overwrite original evidence.
+- No network requests, live email delivery, or containment actions are involved.
 
-- `login_logs.csv` — 15 synthetic login records
-- `detect_logins.py` — detection script and CSV report export
-- `alerts.csv` — generated alert report
-- `investigation_notes.txt` — evidence, fictional follow-up scenarios and proposed responses
+[Project guide](phishing-email-investigation/README.md) · [Original sample](phishing-email-investigation/sample-phishing.eml) · [Analyst report](phishing-email-investigation/investigation-report.md) · [Case study](phishing-email-investigation/CASE-STUDY.md)
 
-## Run
+## Skills demonstrated
 
-From the project folder:
+| Skill | Where to review it |
+|---|---|
+| Windows log investigation | Event status/substatus, logon type, UTC timestamp, and record-ID analysis |
+| Detection engineering | Rolling-window logic, grouping, thresholds, and boundary tests |
+| Email analysis | Header inspection, sample hashing, URL extraction, and evidence-based verdict |
+| PowerShell automation | Reusable collection, parsing, detection, and reporting scripts |
+| Testing and CI | Assertions, malformed-input rejection, and GitHub-hosted Windows jobs |
+| Investigation documentation | Sanitised evidence, provenance, findings, proposed actions, and limitations |
 
+## Run the projects
+
+### Windows tools
+
+From the PowerShell tools folder:
+```powershell
+Set-Location './windows-event-investigation/powershell'
+./Test-RepeatedFailures.ps1
+```
+
+Reading the live Security log requires appropriate privileges. Full collection and reporting instructions are in the [Windows tools guide](windows-event-investigation/powershell/README.md).
+
+### Phishing tools
+
+From the repository root:
+```powershell
+Set-Location './phishing-email-investigation'
+./Test-LabEmail.ps1
+./Test-PhishingReport.ps1
+./New-PhishingReport.ps1
+Invoke-Item './phishing-report.html'
+```
+
+No administrator access is needed for the synthetic phishing tests. The extractor overwrites its extracted-evidence.json output; the report generator writes phishing-report.html. Review scripts and follow applicable execution policies.
+
+### Original Python exercise
+
+From the repository root:
 ```shell
 python detect_logins.py
 ```
 
-On Windows, you can also use:
+Uses the Python standard library and synthetic login_logs.csv. Each run replaces alerts.csv. The documented fixture yields two alerts, for charlie and diana, each following five failures and a success within 2 minutes 30 seconds. Follow-up scenarios in investigation_notes.txt are fictional context, not facts in the CSV.
 
-```cmd
-py detect_logins.py
-```
+## Repository guide
 
-Each run replaces `alerts.csv` with the latest results.
+| Location | Contents |
+|---|---|
+| [windows-event-investigation](windows-event-investigation/README.md) | Windows case study, sanitised evidence, scripts, reports, and test history |
+| [phishing-email-investigation](phishing-email-investigation/README.md) | Original synthetic email, extractor, JSON evidence, reports, and tests |
+| [.github/workflows](.github/workflows) | Windows detector and phishing test workflows |
+| [detect_logins.py](detect_logins.py) | Original synthetic authentication exercise |
+| [investigation_notes.txt](investigation_notes.txt) | Python exercise investigation notes and proposed responses |
 
-## Sample Results
+## Scope and limitations
 
-The supplied dataset produces two alerts:
+These are controlled personal labs. Actual Windows records, synthetic fixtures, analyst conclusions, and proposed responses are identified separately. No production SIEM deployment, confirmed intrusion, or real containment is claimed.
 
-| Account | Failed attempts | Time until success |
-|---------|-----------------|--------------------|
-| charlie | 5 | 2 minutes 30 seconds |
-| diana | 5 | 2 minutes 30 seconds |
+The Windows detector assumes valid, unique records from one host/domain and has no persistent alert suppression. It is not a multi-account password spray detector. The email extractor is a simple plain-text parser, not a general MIME library; it does not perform attachment analysis, reputation checks, or authentication verification. The HTML report associates JSON records by their recorded hash rather than independently rehashing the source email.
 
-Alice and Bob do not meet the alert threshold.
-
-## Investigation Practice
-
-Charlie's fictional follow-up scenario illustrates suspected account compromise and proposed escalation and containment.
-
-Diana's fictional follow-up scenario illustrates likely benign activity and the importance of checking context.
-
-Follow-up details are explicitly labelled as assumptions in the investigation notes. They are not contained in the CSV.
-
-## Detection Behaviour
-
-The script sorts events by timestamp and tracks failures separately for each account and source IP. Failures older than five minutes are excluded. A successful login resets that group's failure history.
-
-## Limitations
-
-- Uses synthetic data and documentation-only IP addresses.
-- Not connected to a live identity system or SIEM.
-- Does not detect password spraying or attacks across multiple IPs.
-- Assumes valid CSV fields and timestamps.
-- No real containment actions were performed.
-
-## Skills Demonstrated
-
-Log analysis, Python scripting, rule-based detection, CSV reporting, alert triage and investigation documentation.
+Future improvements include domain/host-aware grouping, stronger input validation, broader email fixtures, and robust MIME parsing.
