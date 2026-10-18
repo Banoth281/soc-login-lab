@@ -24,7 +24,7 @@ Practical security investigations supported by evidence, reproducible PowerShell
 |---|---|---|
 | Windows collection | Two actual test-account failed-logon records read from the local Security log | [Event evidence](windows-event-investigation/evidence/05-controlled-logon-result.txt) · [Validation](windows-event-investigation/powershell/README.md) |
 | Windows detection | Zero alerts for two events, correctly below the five-event threshold | [Packaged-script verification](windows-event-investigation/powershell/README.md#packaged-script-verification) |
-| Windows automated tests | 8/8 synthetic checks passed locally; hosted Windows test job passed | [Test code](windows-event-investigation/powershell/Test-RepeatedFailures.ps1) · [CI run](https://github.com/Banoth281/soc-login-lab/actions/runs/39113190608) |
+| Windows automated tests | Historical v1: 8/8 passed locally; v2: 30/30 regression checks passed on Windows CI | [Test code](windows-event-investigation/powershell/Test-RepeatedFailures.ps1) · [v2 CI run](https://github.com/Banoth281/soc-login-lab/actions/runs/39117628101) |
 | Windows reporting | CSV export/reimport confirmed; HTML showed two events and zero alerts | [Report validation](windows-event-investigation/powershell/README.md#html-report) |
 | Phishing evidence | Original sample hash independently verified; five submitted files matched ZIP entries | [Validation record](phishing-email-investigation/VALIDATION.md) |
 | Phishing automated tests | Ten extraction checks passed on a hosted Windows runner | [Test code](phishing-email-investigation/Test-LabEmail.ps1) · [CI run](https://github.com/Banoth281/soc-login-lab/actions/runs/39115587909) |
@@ -41,7 +41,7 @@ flowchart TD
     A["Local Security log: Event 4625"] --> B["Extract named XML fields"]
     B --> C["Review failure reason and context"]
     B --> D["Export CSV records"]
-    D --> E["Group by account and source IP"]
+    D --> E["Validate, deduplicate and group by host/domain/account/IP"]
     E --> F{"Five failures within five minutes?"}
     F -->|Yes| G["Flag pattern for investigation"]
     F -->|No| H["Report below-threshold result"]
@@ -58,9 +58,9 @@ flowchart TD
 
 ### Rule and testing
 
-The detector flags at least five failures for the same account/source pair within an **inclusive five-minute rolling window**. It emits at most one alert per pair per invocation.
+The detector flags at least five failures for the same destination host/domain/account/source group within an **inclusive five-minute rolling window**. It emits at most one alert per pair per invocation.
 
-Eight checks cover positive and negative thresholds, the exact 300-second boundary, exclusion at 301 seconds, source/account isolation, unsorted input, and empty input.
+Thirty v2 regression checks retain the original threshold and boundary checks and add domain/host isolation, event identity deduplication, strict input rejection, timezone/IPv6 normalisation, and report integration. [Migration instructions](windows-event-investigation/powershell/README.md#migration-from-the-old-csv) explain why old CSVs must be recollected with the upgraded reader. Historical actual-event results are preserved separately from synthetic v2 tests.
 
 [Investigation guide](windows-event-investigation/README.md) · [PowerShell tools](windows-event-investigation/powershell/README.md) · [Case study](windows-event-investigation/CASE-STUDY.md)
 
@@ -156,6 +156,6 @@ Uses the Python standard library and synthetic login_logs.csv. Each run replaces
 
 These are controlled personal labs. Actual Windows records, synthetic fixtures, analyst conclusions, and proposed responses are identified separately. No production SIEM deployment, confirmed intrusion, or real containment is claimed.
 
-The Windows detector assumes valid, unique records from one host/domain and has no persistent alert suppression. It is not a multi-account password spray detector. The email extractor is a simple plain-text parser, not a general MIME library; it does not perform attachment analysis, reputation checks, or authentication verification. The HTML report associates JSON records by their recorded hash rather than independently rehashing the source email.
+The Windows v2 detector validates records and separates host/domain context, with identity-based deduplication. Unknown domain values remain ambiguous, and there is no persistent alert suppression. It requires the v2 collector schema. It is not a multi-account password spray detector. The email extractor is a simple plain-text parser, not a general MIME library; it does not perform attachment analysis, reputation checks, or authentication verification. The HTML report associates JSON records by their recorded hash rather than independently rehashing the source email.
 
 Future improvements include domain/host-aware grouping, stronger input validation, broader email fixtures, and robust MIME parsing.

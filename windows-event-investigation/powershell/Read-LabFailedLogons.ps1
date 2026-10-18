@@ -18,6 +18,10 @@ foreach ($event in $events) {
         [pscustomobject]@{
             TimeUTC = $event.TimeCreated.ToUniversalTime().ToString('o')
             RecordID = $event.RecordId
+            Computer = [string]$xml.Event.System.Computer
+            Channel = [string]$xml.Event.System.Channel
+            EventID = [int]$xml.Event.System.EventID
+            Domain = $(if ([string]::IsNullOrWhiteSpace($fields['TargetDomainName'])) { '-' } else { $fields['TargetDomainName'] })
             Account = $fields['TargetUserName']
             SourceIP = $fields['IpAddress']
             LogonType = $fields['LogonType']
